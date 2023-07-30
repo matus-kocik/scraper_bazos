@@ -42,3 +42,5 @@ def send_mail():
     server.ehlo()
     server.starttls()
     server.ehlo()
+    
+    server.login(EMAIL, PASSWORD)
