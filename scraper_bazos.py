@@ -26,3 +26,5 @@ if price_string:
     price = price_element.get_text().strip()
 else:
     print("Price not found on the website.")
+
+converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
