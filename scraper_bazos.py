@@ -37,4 +37,7 @@ def check_price():
         print("Price is not change!")
         
 def send_mail():
-    
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
