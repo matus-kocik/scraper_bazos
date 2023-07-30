@@ -13,5 +13,6 @@ soup = BeautifulSoup(page.content, 'html.parser')
 # print(soup.prettify())
 
 title = soup.find(class_="nadpisdetail").get_text()
+# price = soup.find(id="" or class_="").get_text()
 
 print(title)
