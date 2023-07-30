@@ -18,3 +18,5 @@ title = soup.find(class_="nadpisdetail").get_text()
 # print(converted_price)
 
 print(title.strip())
+
+price_string = soup.find(string="Cena:")
