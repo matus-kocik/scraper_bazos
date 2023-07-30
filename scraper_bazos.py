@@ -56,3 +56,5 @@ def send_mail():
     print('Hey email has been sent!')
     
     server.quit()
+
+check_price()
