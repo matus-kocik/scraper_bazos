@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import smtplib
 from config import EMAIL, PASSWORD
+import time
 
 
 URL = 'https://reality.bazos.sk/inzerat/153724690/2-izbovy-svetly-byt-v-tichej-lokalite-ul-karpatska-sekcov.php'
