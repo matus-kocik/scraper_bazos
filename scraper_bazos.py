@@ -11,3 +11,5 @@ page = requests.get(URL, headers=my_headers)
 soup = BeautifulSoup(page.content, 'html.parser')
 
 # print(soup.prettify())
+
+title = soup.find(class_="nadpisdetail").get_text()
