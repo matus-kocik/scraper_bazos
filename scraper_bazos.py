@@ -14,7 +14,7 @@ soup = BeautifulSoup(page.content, 'html.parser')
 
 title = soup.find(class_="nadpisdetail").get_text()
 # price = soup.find(id="" or class_="").get_text()
-# converted_price = price[0:5] - not realy for me
+# converted_price = float(price[0:5]) - not realy for me
 # print(converted_price)
 
 print(title.strip())
