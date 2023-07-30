@@ -20,3 +20,9 @@ title = soup.find(class_="nadpisdetail").get_text()
 print(title.strip())
 
 price_string = soup.find(string="Cena:")
+
+if price_string:
+    price_element = price_string.find_next('b')
+    price = price_element.get_text().strip()
+else:
+    print("Price not found on the website.")
