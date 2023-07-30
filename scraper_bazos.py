@@ -62,5 +62,5 @@ check_price()
 
 while(True):
     check_price()
-    time.sleep(5)
+    time.sleep(60 * 60)
     
