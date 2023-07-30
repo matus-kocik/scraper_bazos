@@ -32,7 +32,7 @@ def check_price():
 
     converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
 
-    if (converted_price > 99991):
+    if (converted_price < 99991):
         send_mail()
     else:
         print("Price is not change!")
