@@ -34,3 +34,6 @@ def check_price():
         send_mail()
     else:
         print("Price is not change!")
+        
+def send_mail():
+    
