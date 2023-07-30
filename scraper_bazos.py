@@ -54,3 +54,5 @@ def send_mail():
     server.sendmail(EMAIL, EMAIL, msg)
     
     print('Hey email has been sent!')
+    
+    server.quit()
