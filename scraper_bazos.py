@@ -44,3 +44,9 @@ def send_mail():
     server.ehlo()
     
     server.login(EMAIL, PASSWORD)
+    
+    subject = 'Price fell down!'
+    
+    body = 'Check the bazos! Link: https://reality.bazos.sk/inzerat/153724690/2-izbovy-svetly-byt-v-tichej-lokalite-ul-karpatska-sekcov.php'
+    
+    msg = f"Subject: {subject}\n\n{body}"
