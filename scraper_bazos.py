@@ -9,9 +9,12 @@ URL = 'https://reality.bazos.sk/inzerat/154307277/2-izbovy-byt-sidliii-presov-aj
 
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 
-def check_price():
-    page = requests.get(URL, headers=my_headers)
+last_price = None
 
+def check_price():
+    global last_price
+    
+    page = requests.get(URL, headers=my_headers)
     soup = BeautifulSoup(page.content, 'html.parser')
 
     # print(soup.prettify())
@@ -20,42 +23,47 @@ def check_price():
     # price = soup.find(id="" or class_="").get_text()
     # converted_price = float(price[0:5]) - not realy for me
     # print(converted_price)
-
-    print(title.strip())
+    if not title:
+        send_mail("Listing Not Found", "The listing on the bazos.sk website was not found.")
+        return
+    # print(title.strip())
 
     price_string = soup.find(string="Cena:")
+    
+    if not price_string:
+        send_mail("Price Not Found", "The listing price on Bazos.sk was not found.")
+        return
 
-    if price_string:
-        price_element = price_string.find_next('b')
-        price = price_element.get_text().strip()
-    else:
-        print("Price not found on the website.")
-
+    price_element = price_string.find_next('b')
+    price = price_element.get_text().strip()
     converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
 
-    if (converted_price < 89_699):
-        send_mail()
+    if last_price is None:
+        send_mail("Listing Found", f"The listing has a current price of {price}.")
+    if last_price != converted_price:
+        if last_price < converted_price:
+            send_mail("Price Increased", f"The listing price increased from {last_price}€ to {converted_price}€.")
+        else:
+            send_mail("Price Decreased", f"The listing price decreased from {last_price}€ to {converted_price}€.")        
     else:
-        print("Price is not change!")
-        
-def send_mail():
+        print("Price Unchanged", f"The listing price remains the same at {converted_price} as before.")
+    
+    last_price = converted_price
+    
+def send_mail(subject, body):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
     server.ehlo()
-    
+
     server.login(EMAIL, PASSWORD)
-    
-    subject = 'Price fell down!'
-    
-    body = 'Check the bazos! Link: https://reality.bazos.sk/inzerat/154307277/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php'
-    
+
     msg = f"Subject: {subject}\n\n{body}"
-    
+
     server.sendmail(EMAIL, EMAIL, msg)
-    
-    print('Hey email has been sent!')
-    
+
+    print(f'Email sent with subject: {subject}')
+
     server.quit()
 
 # check_price()
