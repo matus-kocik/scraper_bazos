@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 from bs4 import BeautifulSoup
 import smtplib
@@ -39,14 +41,15 @@ def check_price():
     converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
 
     if last_price is None:
-        send_mail("Listing Found", f"The listing has a current price of {price}.")
-    if last_price != converted_price:
-        if last_price < converted_price:
-            send_mail("Price Increased", f"The listing price increased from {last_price}€ to {converted_price}€.")
+        send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
+    if last_price is not None:
+        if last_price != converted_price:
+            if last_price < converted_price:
+                send_mail("Price Increased", f"{title} \n The listing price increased from {last_price}€ to {converted_price}€.")
+            else:
+                send_mail("Price Decreased", f"{title} \n The listing price decreased from {last_price}€ to {converted_price}€.")        
         else:
-            send_mail("Price Decreased", f"The listing price decreased from {last_price}€ to {converted_price}€.")        
-    else:
-        print("Price Unchanged", f"The listing price remains the same at {converted_price} as before.")
+            print("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price} as before.")
     
     last_price = converted_price
     
@@ -58,13 +61,12 @@ def send_mail(subject, body):
 
     server.login(EMAIL, PASSWORD)
 
-    msg = f"Subject: {subject}\n\n{body}"
+    msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
+    server.sendmail(EMAIL, EMAIL, msg.encode('utf-8'))
 
-    server.sendmail(EMAIL, EMAIL, msg)
-
-    print(f'Email sent with subject: {subject}')
-
+    print(f'Email was sent with the subject: {subject}')
     server.quit()
+
 
 # check_price()
 
