@@ -5,7 +5,7 @@ from config import EMAIL, PASSWORD
 import time
 
 
-URL = 'https://reality.bazos.sk/inzerat/153724690/2-izbovy-svetly-byt-v-tichej-lokalite-ul-karpatska-sekcov.php'
+URL = 'https://reality.bazos.sk/inzerat/154307277/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php'
 
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 
@@ -33,7 +33,7 @@ def check_price():
 
     converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
 
-    if (converted_price < 99991):
+    if (converted_price < 89_699):
         send_mail()
     else:
         print("Price is not change!")
@@ -48,7 +48,7 @@ def send_mail():
     
     subject = 'Price fell down!'
     
-    body = 'Check the bazos! Link: https://reality.bazos.sk/inzerat/153724690/2-izbovy-svetly-byt-v-tichej-lokalite-ul-karpatska-sekcov.php'
+    body = 'Check the bazos! Link: https://reality.bazos.sk/inzerat/154307277/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php'
     
     msg = f"Subject: {subject}\n\n{body}"
     
