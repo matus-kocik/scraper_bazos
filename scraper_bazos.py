@@ -51,7 +51,7 @@ class BazosScraper(Scraper):
                 else:
                     self.send_mail("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")        
             else:
-                print("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price} as before.")
+                self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price} as before.")
     
         self.last_price = converted_price
     
