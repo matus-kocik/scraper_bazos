@@ -1,4 +1,3 @@
-
 import requests
 from bs4 import BeautifulSoup
 import smtplib
@@ -13,20 +12,20 @@ class Scraper:
         self.last_price = None
         
     def load_data(self):
-        return requests.get(self.url, headers = self.headers)
+        return requests.get(self.url, headers=self.headers)
 
-    def extrakt_data(self, page):
+    def extract_data(self, page):
         raise NotImplementedError
     
     def start(self):
         page = self.load_data()
-        self.extrakt_data(page)
+        self.extract_data(page)
 
 class BazosScraper(Scraper):
     def __init__(self, url, headers):
         super().__init__(url, headers)
         self.connect_to_db()
-        self.last_price = None
+        self.last_price = self.fetch_last_price()
         
     def connect_to_db(self):
         self.connection = mysql.connector.connect(
@@ -36,63 +35,64 @@ class BazosScraper(Scraper):
             database="bazos")
         self.cursor = self.connection.cursor()
         
+    def fetch_last_price(self):
+        query = "SELECT price FROM listings ORDER BY id DESC LIMIT 1"
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result:
+            return float(result[0])
+        return None
+        
     def check_existing(self, title, price):
         query = "SELECT * FROM listings WHERE title = %s AND price = %s"
         self.cursor.execute(query, (title, price))
         return self.cursor.fetchone() is not None
-    
-        
+
     def store_in_db(self, title, price):
         if not self.check_existing(title, price):
             query = "INSERT INTO listings (title, price) VALUES (%s, %s)"
             values = (title, price)
             self.cursor.execute(query, values)
             self.connection.commit()
-        else:
-            print("The listing with the same title and price already exists. Not saving.")
 
-    
-    def extrakt_data(self, page):
+    def extract_data(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
 
-        # title = soup.find(class_="nadpisdetail").get_text()
         title_element = soup.find(class_="nadpisdetail")
-        if title_element:
-            title = title_element.get_text()
-        else:
+        if not title_element:
             print("Title element was not found on the page!")
             return
+        title = title_element.get_text()
 
-
-        if not title:
-            self.send_mail("Listing Not Found", "The listing on the bazos.sk website was not found.")
-            return
-        
         price_string = soup.find(string="Cena:")
         if not price_string:
             self.send_mail("Price Not Found", "The listing price on Bazos.sk was not found.")
             return
 
-
-
         price_element = price_string.find_next('b')
         price = price_element.get_text().strip()
         converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
-        self.store_in_db(title, converted_price)
 
-        if self.last_price is None:
-            self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
-        if self.last_price is not None:
-            if self.last_price != converted_price:
-                if self.last_price < converted_price:
-                    self.send_mail("Price Increased", f"{title} \n The listing price increased from {self.last_price}€ to {converted_price}€.")
-                else:
-                    self.send_mail("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")        
+        exists_in_db = self.check_existing(title, converted_price)
+
+        if not exists_in_db:
+            self.store_in_db(title, converted_price)
+            if self.last_price is None:
+                self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
+            elif self.last_price < converted_price:
+                self.send_mail("Price Increased", f"{title} \n The listing price increased from {self.last_price}€ to {converted_price}€.")
+            elif self.last_price > converted_price:
+                self.send_mail("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")
             else:
-                self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price} as before.")
-    
+                self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
+        elif self.last_price == converted_price:
+            self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
+        else:
+            print("The listing with a different price already exists. Not saving or sending an email.")
+
         self.last_price = converted_price
-    
+
+
     def send_mail(self, subject, body):
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
@@ -113,4 +113,3 @@ scraper.start()
 # while(True):
 #     scraper.start()
 #     time.sleep(60 * 60)
-    
