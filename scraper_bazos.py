@@ -4,6 +4,10 @@ import smtplib
 from config import EMAIL, PASSWORD
 import time
 import mysql.connector
+import logging
+
+logging.basicConfig(filename='scraper_errors.log', level=logging.ERROR)
+
 
 class Scraper:
     def __init__(self, url, headers):
@@ -28,13 +32,17 @@ class BazosScraper(Scraper):
         self.last_price = self.fetch_last_price()
         
     def connect_to_db(self):
-        self.connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="bazos")
-        self.cursor = self.connection.cursor()
-        
+        try:
+            self.connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="",
+                database="bazos")
+            self.cursor = self.connection.cursor()
+        except mysql.connector.Error as err:
+            logging.error(f"Database error: {err}")
+            self.send_mail("Database Connection Error", f"Thera was an error connecting to the database: {err}")
+                
     def fetch_last_price(self):
         query = "SELECT price FROM listings ORDER BY id DESC LIMIT 1"
         self.cursor.execute(query)
