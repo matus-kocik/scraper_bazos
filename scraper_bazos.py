@@ -102,15 +102,18 @@ class BazosScraper(Scraper):
 
 
     def send_mail(self, subject, body):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(EMAIL, PASSWORD)
-        msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
-        server.sendmail(EMAIL, EMAIL, msg.encode('utf-8'))
-        print(f'Email was sent with the subject: {subject}')
-        server.quit()
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(EMAIL, PASSWORD)
+            msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
+            server.sendmail(EMAIL, EMAIL, msg.encode('utf-8'))
+            print(f'Email was sent with the subject: {subject}')
+            server.quit()
+        except Exception as e:
+            logging.error(f"Email sending error: {e}")            
         
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 URL = 'https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php'
