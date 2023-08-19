@@ -22,8 +22,13 @@ class Scraper:
         raise NotImplementedError
     
     def start(self):
-        page = self.load_data()
-        self.extract_data(page)
+        try:
+            page = self.load_data()
+            self.extract_data(page)
+        except requests.RequestException as er:
+            logging.error(f"Web scraping error: {er}")
+            self.send_mail("Web Scraping Error", f"There was an error scraping the website: {er}")
+
 
 class BazosScraper(Scraper):
     def __init__(self, url, headers):
