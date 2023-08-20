@@ -29,12 +29,32 @@ class Scraper:
             logging.error(f"Web scraping error: {er}")
             self.send_mail("Web Scraping Error", f"There was an error scraping the website: {er}")
 
+class Emailer:
+    def __init__(self):
+        self.email = EMAIL
+        self.password = PASSWORD
+    
+    def send(self, subject, body):
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(self.email, self.password)
+            msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
+            server.sendmail(self.email, self.email, msg.encode('utf-8'))
+            print(f'Email was sent with the subject: {subject}')
+            server.quit()
+        except Exception as e:
+            logging.error(f"Email sending error: {e}")              
+
 
 class BazosScraper(Scraper):
     def __init__(self, url, headers):
         super().__init__(url, headers)
         self.connect_to_db()
         self.last_price = self.fetch_last_price(self.url)
+        self.emailer = Emailer()
         
     def connect_to_db(self):
         try:
@@ -46,7 +66,7 @@ class BazosScraper(Scraper):
             self.cursor = self.connection.cursor()
         except mysql.connector.Error as err:
             logging.error(f"Database error: {err}")
-            self.send_mail("Database Connection Error", f"Thera was an error connecting to the database: {err}")
+            self.emailer.send("Database Connection Error", f"Thera was an error connecting to the database: {err}")
                 
     def fetch_last_price(self, url):
         query = "SELECT price FROM listings WHERE url = %s ORDER BY id DESC LIMIT 1"
@@ -89,7 +109,7 @@ class BazosScraper(Scraper):
 
         price_string = soup.find(string="Cena:")
         if not price_string:
-            self.send_mail("Price Not Found", "The listing price on Bazos.sk was not found.")
+            self.emailer.send("Price Not Found", "The listing price on Bazos.sk was not found.")
             return
 
         price_element = price_string.find_next('b')
@@ -102,33 +122,20 @@ class BazosScraper(Scraper):
 
         if not exists_in_db:
             self.store_in_db(title, converted_price, self.url)
-            self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
+            self.emailer.send("Listing Found", f"{title} \n The listing has a current price of {price}.")
         elif self.last_price is not None:
             if self.last_price < converted_price:
-                self.send_mail("Price Increased", f"{title} \n The listing price increased from {self.last_price}€ to {converted_price}€.")
+                self.emailer.send("Price Increased", f"{title} \n The listing price increased from {self.last_price}€ to {converted_price}€.")
             elif self.last_price > converted_price:
-                self.send_mail("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")
+                self.emailer.send("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")
             else:
-                self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
+                self.emailer.send("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
 
 
 
         self.last_price = converted_price
 
-
-    def send_mail(self, subject, body):
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(EMAIL, PASSWORD)
-            msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
-            server.sendmail(EMAIL, EMAIL, msg.encode('utf-8'))
-            print(f'Email was sent with the subject: {subject}')
-            server.quit()
-        except Exception as e:
-            logging.error(f"Email sending error: {e}")            
+    
         
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 URLS = [
