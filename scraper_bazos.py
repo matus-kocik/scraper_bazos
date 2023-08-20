@@ -132,8 +132,9 @@ class BazosScraper(Scraper):
         
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 URLS = [
-    'https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php',
-    'https://reality.bazos.sk/inzerat/154646233/na-predaj-velky-2-izbovy-byt-v-presove-sidlisko-iii.php',
+    "https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php",
+    "https://reality.bazos.sk/inzerat/154646233/na-predaj-velky-2-izbovy-byt-v-presove-sidlisko-iii.php",
+    "https://reality.bazos.sk/inzerat/154559079/nova-cena-2-izbovy-byt-s-loggiou-59-m2-sibirska-ulica.php",
 ]
 
 for url in URLS:
