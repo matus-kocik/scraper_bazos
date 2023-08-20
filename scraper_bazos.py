@@ -142,6 +142,13 @@ URLS = [
     "https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php",
     "https://reality.bazos.sk/inzerat/154646233/na-predaj-velky-2-izbovy-byt-v-presove-sidlisko-iii.php",
     "https://reality.bazos.sk/inzerat/154559079/nova-cena-2-izbovy-byt-s-loggiou-59-m2-sibirska-ulica.php",
+    "https://reality.bazos.sk/inzerat/153749581/2-izbovy-bytmbenkusekcov60-m22-loggiecena-dohodou.php",
+    "https://reality.bazos.sk/inzerat/154325282/2-izbovy-byt-57-m2-loggia-sidlisko-3-presov.php",
+    "https://reality.bazos.sk/inzerat/154532062/3d-prehliadka-2-izbovy-byt-62-m2-srobarova-presov.php",
+    "https://reality.bazos.sk/inzerat/154263367/na-predaj-2-izbovy-byt-v-presove-exkluzivne.php",
+    "https://reality.bazos.sk/inzerat/154366420/2-izbovy-byt-s-vyhladom-v-pokojnej-lokalite-ul-karpatska.php",
+    "https://reality.bazos.sk/inzerat/153900238/priestranny-2-izbovy-byt-s-balkonom-57-m2-sekcov.php",
+    "https://reality.bazos.sk/inzerat/154532064/3d-prehliadka-3-izbovy-byt-62-m2-srobarova-presov.php"
 ]
 
 for url in URLS:
