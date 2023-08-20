@@ -101,19 +101,16 @@ class BazosScraper(Scraper):
         exists_in_db = self.check_existing(title, converted_price)
 
         if not exists_in_db:
-            self.store_in_db(title, converted_price,self.url)
-            if self.last_price is None:
-                self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
-            elif self.last_price < converted_price:
+            self.store_in_db(title, converted_price, self.url)
+            self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
+        elif self.last_price is not None:
+            if self.last_price < converted_price:
                 self.send_mail("Price Increased", f"{title} \n The listing price increased from {self.last_price}€ to {converted_price}€.")
             elif self.last_price > converted_price:
                 self.send_mail("Price Decreased", f"{title} \n The listing price decreased from {self.last_price}€ to {converted_price}€.")
             else:
                 self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
-        elif self.last_price == converted_price:
-            self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
-        else:
-            print("The listing with a different price already exists. Not saving or sending an email.")
+
 
 
         self.last_price = converted_price
