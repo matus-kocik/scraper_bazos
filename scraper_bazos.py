@@ -8,6 +8,24 @@ import logging
 
 logging.basicConfig(filename='scraper_errors.log', level=logging.ERROR)
 
+class Emailer:
+    def __init__(self):
+        self.email = EMAIL
+        self.password = PASSWORD
+    
+    def send(self, subject, body):
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(self.email, self.password)
+            msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
+            server.sendmail(self.email, self.email, msg.encode('utf-8'))
+            print(f'Email was sent with the subject: {subject}')
+            server.quit()
+        except Exception as e:
+            logging.error(f"Email sending error: {e}")              
 
 class Scraper:
     def __init__(self, url, headers):
@@ -28,26 +46,6 @@ class Scraper:
         except requests.RequestException as er:
             logging.error(f"Web scraping error: {er}")
             self.send_mail("Web Scraping Error", f"There was an error scraping the website: {er}")
-
-class Emailer:
-    def __init__(self):
-        self.email = EMAIL
-        self.password = PASSWORD
-    
-    def send(self, subject, body):
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(self.email, self.password)
-            msg = f"Subject: {subject}\nContent-Type: text/plain; charset=UTF-8\n\n{body}"
-            server.sendmail(self.email, self.email, msg.encode('utf-8'))
-            print(f'Email was sent with the subject: {subject}')
-            server.quit()
-        except Exception as e:
-            logging.error(f"Email sending error: {e}")              
-
 
 class BazosScraper(Scraper):
     def __init__(self, url, headers):
