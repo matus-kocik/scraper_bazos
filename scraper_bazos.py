@@ -34,7 +34,7 @@ class BazosScraper(Scraper):
     def __init__(self, url, headers):
         super().__init__(url, headers)
         self.connect_to_db()
-        self.last_price = self.fetch_last_price()
+        self.last_price = self.fetch_last_price(self.url)
         
     def connect_to_db(self):
         try:
@@ -48,9 +48,9 @@ class BazosScraper(Scraper):
             logging.error(f"Database error: {err}")
             self.send_mail("Database Connection Error", f"Thera was an error connecting to the database: {err}")
                 
-    def fetch_last_price(self):
-        query = "SELECT price FROM listings ORDER BY id DESC LIMIT 1"
-        self.cursor.execute(query)
+    def fetch_last_price(self, url):
+        query = "SELECT price FROM listings WHERE url = %s ORDER BY id DESC LIMIT 1"
+        self.cursor.execute(query, (url,))
         result = self.cursor.fetchone()
         if result:
             return float(result[0])
@@ -61,10 +61,10 @@ class BazosScraper(Scraper):
         self.cursor.execute(query, (title, price))
         return self.cursor.fetchone() is not None
 
-    def store_in_db(self, title, price):
+    def store_in_db(self, title, price, url):
         if not self.check_existing(title, price):
-            query = "INSERT INTO listings (title, price) VALUES (%s, %s)"
-            values = (title, price)
+            query = "INSERT INTO listings (title, price, url) VALUES (%s, %s, %s)"
+            values = (title, price, url)
             self.cursor.execute(query, values)
             self.connection.commit()
 
@@ -88,8 +88,10 @@ class BazosScraper(Scraper):
 
         exists_in_db = self.check_existing(title, converted_price)
 
+        exists_in_db = self.check_existing(title, converted_price)
+
         if not exists_in_db:
-            self.store_in_db(title, converted_price)
+            self.store_in_db(title, converted_price,self.url)
             if self.last_price is None:
                 self.send_mail("Listing Found", f"{title} \n The listing has a current price of {price}.")
             elif self.last_price < converted_price:
@@ -102,6 +104,7 @@ class BazosScraper(Scraper):
             self.send_mail("Price Unchanged", f"{title} \n The listing price remains the same at {converted_price}€ as before.")
         else:
             print("The listing with a different price already exists. Not saving or sending an email.")
+
 
         self.last_price = converted_price
 
@@ -121,10 +124,14 @@ class BazosScraper(Scraper):
             logging.error(f"Email sending error: {e}")            
         
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
-URL = 'https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php'
-scraper = BazosScraper(URL, my_headers)
+URLS = [
+    'https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php',
+    'https://reality.bazos.sk/inzerat/154646233/na-predaj-velky-2-izbovy-byt-v-presove-sidlisko-iii.php',
+]
 
-scraper.start()
+for url in URLS:
+    scraper = BazosScraper(url, my_headers)
+    scraper.start()
 
 # while(True):
 #     scraper.start()
