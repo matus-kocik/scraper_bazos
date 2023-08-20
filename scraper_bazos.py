@@ -53,7 +53,7 @@ class BazosScraper(Scraper):
         self.cursor.execute(query, (url,))
         result = self.cursor.fetchone()
         if result:
-            return float(result[0])
+            return float(result[0])             
         return None
         
     def check_existing(self, title, price):
@@ -65,8 +65,12 @@ class BazosScraper(Scraper):
         if not self.check_existing(title, price):
             query = "INSERT INTO listings (title, price, url) VALUES (%s, %s, %s)"
             values = (title, price, url)
-            self.cursor.execute(query, values)
-            self.connection.commit()
+            try:
+                self.cursor.execute(query, values)
+                self.connection.commit()
+            except mysql.connector.Error as erro:
+                logging.error(f"Error while storing i DB: {erro}")
+                print(f"Error while storing in DB: {erro}")
 
     def extract_data(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
