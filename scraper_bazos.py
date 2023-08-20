@@ -60,8 +60,14 @@ class BazosScraper(Scraper):
         query = "SELECT * FROM listings WHERE title = %s AND price = %s"
         self.cursor.execute(query, (title, price))
         return self.cursor.fetchone() is not None
+    
+    def check_connection(self):
+        if not self.connection.is_connected():
+            print("Database connection lost. Reconnecting...")
+            self.connect_to_do()
 
     def store_in_db(self, title, price, url):
+        self.check_connection()
         if not self.check_existing(title, price):
             query = "INSERT INTO listings (title, price, url) VALUES (%s, %s, %s)"
             values = (title, price, url)
