@@ -25,7 +25,9 @@ class Emailer:
             print(f'Email was sent with the subject: {subject}')
             server.quit()
         except Exception as e:
-            logging.error(f"Email sending error: {e}")              
+            logging.error(f"Email sending error: {e}") 
+            
+# This is Placeholder for class DatabaseManager :)             
 
 class Scraper:
     def __init__(self, url, headers):
@@ -50,9 +52,9 @@ class Scraper:
 class BazosScraper(Scraper):
     def __init__(self, url, headers):
         super().__init__(url, headers)
+        self.emailer = Emailer()
         self.connect_to_db()
         self.last_price = self.fetch_last_price(self.url)
-        self.emailer = Emailer()
         
     def connect_to_db(self):
         try:
