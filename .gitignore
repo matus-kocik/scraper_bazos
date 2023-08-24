@@ -9,6 +9,7 @@ note.md
 config.py
 scraper_bazos_new.py
 scraper_errors.log
+scraper_bazos_comment.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

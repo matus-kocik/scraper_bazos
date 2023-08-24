@@ -61,7 +61,7 @@ class BazosScraper(Scraper):
             self.connection = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",
+                password="Solivar23*",
                 database="bazos")
             self.cursor = self.connection.cursor()
         except mysql.connector.Error as err:
@@ -116,7 +116,6 @@ class BazosScraper(Scraper):
         price = price_element.get_text().strip()
         converted_price = float(price.replace("€", "").replace(" ", "").replace(",", "."))
 
-        exists_in_db = self.check_existing(title, converted_price)
 
         exists_in_db = self.check_existing(title, converted_price)
 
