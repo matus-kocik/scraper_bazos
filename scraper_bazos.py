@@ -53,20 +53,59 @@ class BazosScraper(Scraper):
     def __init__(self, url, headers):
         super().__init__(url, headers)
         self.emailer = Emailer()
+        self.create_database()
         self.connect_to_db()
         self.last_price = self.fetch_last_price(self.url)
         
+    def create_database(self):
+        try:
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password=" "
+            )
+            cursor = connection.cursor()
+            cursor.execute("CREATE DATABASE IF NOT EXISTS bazos")
+            print("Database 'bazos' has been created or already exists.")
+            cursor.close()
+            connection.close()
+        except mysql.connector.Error as err:
+            print(f"Error creating database: {err}")
+            logging.error(f"Error creating database: {err}")
+         
     def connect_to_db(self):
         try:
             self.connection = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="Solivar23*",
+                password=" ",
                 database="bazos")
             self.cursor = self.connection.cursor()
+
+            self.create_table()
+
         except mysql.connector.Error as err:
+            print(f"Database error: {err}")
             logging.error(f"Database error: {err}")
-            self.emailer.send("Database Connection Error", f"Thera was an error connecting to the database: {err}")
+            self.emailer.send("Database Connection Error", f"There was an error connecting to the database: {err}")
+          
+    def create_table(self):
+        try:
+            query = """
+            CREATE TABLE IF NOT EXISTS listings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255),
+                price FLOAT,
+                url TEXT
+            );
+            """
+            self.cursor.execute(query)
+            self.connection.commit()
+            print("Table listings has been created or already exists.")
+        except mysql.connector.Error as erro:
+            logging.error(f"Error while creating table: {erro}")
+            print(f"Error while creating table: {erro}")
+
                 
     def fetch_last_price(self, url):
         query = "SELECT price FROM listings WHERE url = %s ORDER BY id DESC LIMIT 1"
@@ -138,16 +177,18 @@ class BazosScraper(Scraper):
         
 my_headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
 URLS = [
-    "https://reality.bazos.sk/inzerat/154590455/2-izbovy-byt-sidliii-presov-aj-na-splatky-bez-hypoteky.php",
+    "https://reality.bazos.sk/inzerat/154864799/2-izbovy-byt-na-predaj-matice-slovenskej-presov.php",
     "https://reality.bazos.sk/inzerat/154646233/na-predaj-velky-2-izbovy-byt-v-presove-sidlisko-iii.php",
     "https://reality.bazos.sk/inzerat/154559079/nova-cena-2-izbovy-byt-s-loggiou-59-m2-sibirska-ulica.php",
-    "https://reality.bazos.sk/inzerat/153749581/2-izbovy-bytmbenkusekcov60-m22-loggiecena-dohodou.php",
+    "https://reality.bazos.sk/inzerat/154799742/na-predaj-2-izbovy-byt-v-top-lokalite-sidlisko-3-presov.php",
     "https://reality.bazos.sk/inzerat/154325282/2-izbovy-byt-57-m2-loggia-sidlisko-3-presov.php",
     "https://reality.bazos.sk/inzerat/154532062/3d-prehliadka-2-izbovy-byt-62-m2-srobarova-presov.php",
-    "https://reality.bazos.sk/inzerat/154263367/na-predaj-2-izbovy-byt-v-presove-exkluzivne.php",
+    "https://reality.bazos.sk/inzerat/154829870/2-izbovy-bytmbenkusekcov60-m22-loggievyborna-lokalita.php",
     "https://reality.bazos.sk/inzerat/154742044/2-izbovy-svetly-byt-v-povodnom-stave-sekcovul-karpatska.php",
     "https://reality.bazos.sk/inzerat/153900238/priestranny-2-izbovy-byt-s-balkonom-57-m2-sekcov.php",
-    "https://reality.bazos.sk/inzerat/154532064/3d-prehliadka-3-izbovy-byt-62-m2-srobarova-presov.php"
+    "https://reality.bazos.sk/inzerat/154532064/3d-prehliadka-3-izbovy-byt-62-m2-srobarova-presov.php",
+    "https://reality.bazos.sk/inzerat/154532062/3d-prehliadka-2-izbovy-byt-62-m2-srobarova-presov.php",
+    "https://reality.bazos.sk/inzerat/154742044/2-izbovy-svetly-byt-v-povodnom-stave-sekcovul-karpatska.php"
 ]
 
 for url in URLS:
