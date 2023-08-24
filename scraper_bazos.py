@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import smtplib
-from config import EMAIL, PASSWORD
+from config import EMAIL, PASSWORD, PASSWORD_DB
 import time
 import mysql.connector
 import logging
@@ -62,7 +62,7 @@ class BazosScraper(Scraper):
             connection = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password=" "
+                password = PASSWORD_DB
             )
             cursor = connection.cursor()
             cursor.execute("CREATE DATABASE IF NOT EXISTS bazos")
@@ -78,7 +78,7 @@ class BazosScraper(Scraper):
             self.connection = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password=" ",
+                password= PASSWORD_DB,
                 database="bazos")
             self.cursor = self.connection.cursor()
 
